@@ -16,7 +16,6 @@
       <div class="map-shade"></div>
       <svg id="locations" aria-label="Restaurant locations"></svg>
       <svg id="photo-leaders" aria-hidden="true"></svg>
-      <div id="map-graphs"></div>
       <div id="restaurants"></div>
     </div>
     <div class="map-vignette" aria-hidden="true"></div>
@@ -46,20 +45,12 @@
     <svg id="journey-mini" viewBox="0 0 520 110" aria-hidden="true"></svg>
     <span class="dock-caption">One meal. More than the food.</span>
   </button>
-  <p id="inline-note" hidden></p>
-  <div id="inline-tools" hidden>
-    <div class="inline-keys">
-      <div class="graph-key"><span><i class="key-dot positive-bg"></i>Positive</span><span><i class="key-dot depends-bg"></i>Depends</span><span><i class="key-dot negative-bg"></i>Negative</span></div>
-      <div class="inline-evidence">[F] Fact · [OBS] Descriptive · [?] Tentative · [TBC] Unverified<br>[EXP/?] Prior experience · [HEARSAY] Unconfirmed report</div>
-    </div>
-    <div class="inline-tool-buttons"><button id="inline-replay" aria-label="Replay last opened graph">↻</button><button id="inline-fit" aria-label="Fit the whole map">⛶</button><button id="inline-close">Collapse <span aria-hidden="true">×</span></button></div>
-  </div>
 
   <section id="intro" class="intro" aria-labelledby="intro-title">
     <div class="intro-content">
       <h1 id="intro-title">Regional<br><span>McDonald’s<span class="yellow-period">.</span></span></h1>
       <p class="intro-copy">This is a journey through a McDonald’s, as <b>me, a customer or a delivery courier.</b> We leave with an impression — shaped by the taste of the food, but also by the space we experience.</p>
-      <p class="intro-question">Across Hong Kong, what changes from one restaurant to another?<br>And which part of the journey becomes <span class="positive">positive</span>, <span class="negative">negative</span>, or <span class="depends">dependent on context</span>?</p>
+      <p class="intro-question">Across Hong Kong, what changes from one restaurant to another?<br> And which part of the journey becomes <span class="positive">positive</span>, <span class="negative">negative</span>, or <span class="depends">dependent on context</span>?</p>
     </div>
     <div class="intro-journey-wrap">
       <div id="intro-journey" aria-label="Customer journey node graph"></div>
@@ -81,7 +72,10 @@
       <div id="modal-copy"></div>
       <div id="modal-graph"></div>
       <footer id="graph-footer">
-        <div class="graph-key"><span><i class="key-dot positive-bg"></i>Positive</span><span><i class="key-dot depends-bg"></i>Depends</span><span><i class="key-dot negative-bg"></i>Negative</span></div>
+        <div class="footer-keys">
+          <div class="graph-key"><span><i class="key-dot positive-bg"></i>Positive</span><span><i class="key-dot depends-bg"></i>Depends</span><span><i class="key-dot negative-bg"></i>Negative</span></div>
+          <div class="inline-evidence">[F] Fact · [OBS] Descriptive · [?] Tentative · [TBC] Unverified · [EXP/?] Prior experience · [HEARSAY] Unconfirmed report</div>
+        </div>
         <span class="graph-instructions">Drag nodes · Scroll to zoom · Drag the background to move</span>
         <div class="graph-controls"><button id="graph-zoom-in" aria-label="Zoom into graph">+</button><button id="graph-zoom-out" aria-label="Zoom out of graph">−</button><button id="graph-replay">Replay ↻</button><button id="graph-fit">Fit view ⛶</button></div>
       </footer>

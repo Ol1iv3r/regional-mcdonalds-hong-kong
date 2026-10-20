@@ -6,9 +6,7 @@ const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const worldWidth = 1800;
 const camera = { x: 0, y: 0, scale: 1, tx: 0, ty: 0, ts: 1, vx: 0, vy: 0, vs: 0 };
 const pointers = new Map();
-let content, worldHeight, baseScale, mapFrame = 0, introGraph, modalGraph, inlineGraph, returnFocus, savedCamera;
-const openGraphs = new Map();
-let lastRestaurant = null;
+let content, worldHeight, baseScale, mapFrame = 0, introGraph, modalGraph, returnFocus;
 let photoElements = [], pinElements = [], leaderElements = [];
 let exploring = false, moved = false, pinchState = null, modalSession = 0;
 const offsets = [
@@ -300,50 +298,18 @@ function closeModal() {
   $('map').inert = false;
   document.querySelectorAll('.map-ui').forEach(el => { el.inert = false; });
   if (!exploring) $('intro').inert = false;
+  document.querySelectorAll('.restaurant-pin').forEach(el => el.setAttribute('aria-expanded','false'));
   returnFocus?.focus({ preventScroll:true });
 }
 function openRestaurant(restaurant) {
-  if (openGraphs.has(restaurant.id)) { closeRestaurant(restaurant.id); return; }
-  const container = document.createElement('div');
-  container.className = 'map-graph-layer';
-  container.setAttribute('aria-label', `${restaurant.name} system graph`);
-  $('map-graphs').append(container);
-  const graph = new GraphView(container, restaurant, {
-    reducedMotion, geographic:true, rootColor:'#ee665e', lockRoot:true,
-    onNodeFocus: node => {
-      const factor = worldWidth / 2383.937;
-      const scale = Math.max(camera.ts, baseScale * 4);
-      camera.ts = scale;
-      camera.tx = innerWidth / 2 - node.x * factor * scale;
-      camera.ty = innerHeight / 2 - node.y * factor * scale;
-      wakeMap();
-    }
-  });
-  openGraphs.set(restaurant.id, { graph,container,restaurant });
-  inlineGraph = graph; lastRestaurant = restaurant.id;
-  $('inline-tools').hidden = false;
+  openModal(restaurant.name, '');
   const notes = (restaurant.notes || []).map(note => typeof note === 'string' ? note : note.text || note.label || '').filter(Boolean);
-  $('inline-note').textContent = notes.join(' ');
-  $('inline-note').hidden = !notes.length;
-  document.body.classList.add('graph-open');
-  document.querySelectorAll(`[data-restaurant="${restaurant.id}"]`).forEach(el => {
-    el.classList.add('is-open');
-    if (el.classList.contains('restaurant-pin')) el.setAttribute('aria-expanded','true');
+  if (notes.length) $('modal-copy').innerHTML = `<p class="graph-note">${notes.map(escapeHTML).join(' ')}</p>`;
+  document.querySelectorAll(`.restaurant-pin[data-restaurant="${restaurant.id}"]`).forEach(el => el.setAttribute('aria-expanded','true'));
+  const session = modalSession;
+  requestAnimationFrame(() => {
+    if (session === modalSession && !$('modal').hidden) modalGraph = new GraphView($('modal-graph'), restaurant, { reducedMotion });
   });
-}
-function closeRestaurant(id = lastRestaurant) {
-  const entry = openGraphs.get(id);
-  if (!entry) return;
-  entry.graph.destroy(); entry.container.remove(); openGraphs.delete(id);
-  document.querySelectorAll(`[data-restaurant="${id}"]`).forEach(el => {
-    el.classList.remove('is-open');
-    if (el.classList.contains('restaurant-pin')) el.setAttribute('aria-expanded','false');
-  });
-  lastRestaurant = [...openGraphs.keys()].at(-1) || null;
-  inlineGraph = openGraphs.get(lastRestaurant)?.graph || null;
-  $('inline-tools').hidden = !openGraphs.size;
-  $('inline-note').hidden = true;
-  document.body.classList.toggle('graph-open', openGraphs.size > 0);
 }
 function openJourney() {
   if (!content) return;
@@ -385,11 +351,8 @@ $('graph-fit').addEventListener('click', () => modalGraph?.fit());
 $('graph-replay').addEventListener('click', () => modalGraph?.replay());
 $('graph-zoom-in').addEventListener('click', () => modalGraph?.zoomBy(1.45));
 $('graph-zoom-out').addEventListener('click', () => modalGraph?.zoomBy(1 / 1.45));
-$('inline-close').addEventListener('click', () => closeRestaurant());
-$('inline-fit').addEventListener('click', () => resetMap());
-$('inline-replay').addEventListener('click', () => inlineGraph?.replay());
 window.addEventListener('keydown', event => {
-  if ($('modal').hidden) { if (event.key === 'Escape' && inlineGraph) closeRestaurant(); return; }
+  if ($('modal').hidden) return;
   if (event.key === 'Escape') closeModal();
   if (event.key === 'Tab') {
     const focusable = [...$('modal').querySelectorAll('button,[tabindex="0"],a[href]')].filter(el => el.offsetParent !== null);

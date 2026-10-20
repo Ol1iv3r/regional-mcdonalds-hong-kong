@@ -16,8 +16,8 @@ Open [http://localhost:8780](http://localhost:8780). Serve the files over HTTP; 
 
 - The opening screen introduces the research and the complete customer journey.
 - Select **Explore the map** to pan around Hong Kong. Scroll or pinch to zoom; the reset control restores the full map.
-- Click a red location point or restaurant photograph to unfold its graph directly on the map. Click that restaurant again to collapse it. Each restaurant opens independently; the others stay open.
-- Graphs unfold in stages with damped motion, following their positions in the original poster. Drag nodes, drag the map background to pan, and scroll or pinch to zoom. The lower controls provide replay, full-map view, and collapse for the most recently opened graph.
+- Click a red location point or restaurant photograph to unfold its complete graph in a translucent window over the map.
+- Graphs unfold in stages with damped motion. Drag nodes, drag the graph background to pan, and scroll or pinch to zoom. The lower controls provide replay, fit, and zoom. Closing the window restores the same map position.
 - The research prompt, title/reading key, and customer-journey dock each open a larger panel. Use the close button or Escape to return.
 - Keyboard support includes map arrow-key panning, `+`/`−` zooming and `0` reset. Graph nodes support arrow-key movement and Enter to focus.
 - Reduced-motion preferences disable decorative movement and spring animation.
@@ -26,7 +26,7 @@ Open [http://localhost:8780](http://localhost:8780). Serve the files over HTTP; 
 
 The satellite map is the original **7,923 × 5,596 pixel JPEG image stream extracted from the supplied PDF**. Its bytes are retained, with no resampling or additional JPEG compression. Restaurant photographs are also original PDF image streams. Zooming beyond source resolution cannot create additional detail, but the website does not discard the source pixels.
 
-The five systems retain all **210 nodes and 278 connections**. The customer journey retains **17 nodes and 25 connections**, including the taste and space captions. Foreground text was extracted from the current PDF instead of older hidden text inside Illustrator’s PDF resources. Restaurant graphs use the poster’s geographic positions; source node IDs, relationships, colours, and current statements are preserved.
+The five systems retain all **210 nodes and 278 connections**. The customer journey retains **17 nodes and 25 connections**, including the taste and space captions. Foreground text was extracted from the current PDF instead of older hidden text inside Illustrator’s PDF resources. Restaurant graphs are arranged for interactive reading; source node IDs, relationships, colours, and current statements are preserved.
 
 The map contains the **269 branch locations** from the source map’s 19 October 2026 snapshot. It is a research artifact, not a live restaurant directory. `[OBS]` follows the poster’s use as a descriptive-statement code; it does not mean that every statement was independently verified. The complete evidence legend is available from the title/reading-key panel.
 

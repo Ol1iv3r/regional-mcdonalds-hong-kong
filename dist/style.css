@@ -112,19 +112,21 @@ h1>span{color:var(--yellow)}
 #loading-note:empty{display:none}
 .modal{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center}
 [hidden]{display:none!important}
-.modal-backdrop{position:absolute;inset:0;background:rgba(3,15,19,.64);backdrop-filter:blur(8px);animation:fade-in .35s both}
-.modal-panel{position:relative;width:calc(100% - 48px);height:calc(100% - 48px);border:1px solid #b9ccc52b;background:radial-gradient(ellipse at 50% 15%,#1a3031,#101e21 80%);border-radius:6px;box-shadow:0 25px 100px #0005;display:flex;flex-direction:column;overflow:hidden;animation:panel-in .52s cubic-bezier(.19,1,.22,1) both}
+.modal-backdrop{position:absolute;inset:0;background:rgba(3,15,19,.16);animation:fade-in .35s both}
+.modal-panel{position:relative;width:calc(100% - 48px);height:calc(100% - 48px);border:1px solid #b9ccc540;background:rgba(10,29,33,.84);backdrop-filter:blur(8px);border-radius:6px;box-shadow:0 25px 100px #0003;display:flex;flex-direction:column;overflow:hidden;animation:panel-in .52s cubic-bezier(.19,1,.22,1) both}
 @keyframes panel-in{from{opacity:0;transform:translateY(25px) scale(.96)}to{opacity:1;transform:none}}
 @keyframes fade-in{from{opacity:0}to{opacity:1}}
 .modal-header{display:flex;align-items:center;justify-content:space-between;padding:24px 30px 18px;flex-shrink:0;border-bottom:1px solid #fff1}
 .modal-header .eyebrow{font-size:9px;color:var(--muted);letter-spacing:1.7px}
+.modal-header .eyebrow:empty{display:none}
 h2{font-size:clamp(21px,2.1vw,30px);font-weight:450;letter-spacing:-.8px;margin:6px 0 0}
 .icon-button{display:grid;place-items:center;width:36px;height:36px;border:1px solid var(--hairline);border-radius:50%;font-size:26px;font-weight:200;flex-shrink:0;line-height:1}
 .icon-button:hover{background:#ffffff0c;border-color:#d8ddd680}
 #modal-copy{flex-shrink:0}
 #modal-copy .graph-note{font-size:10px;color:#b6c6c2;margin:12px 30px 0;max-width:1100px;line-height:1.5}
 #modal-graph{width:100%;flex:1;min-height:0;touch-action:none;position:relative}
-#graph-footer{height:50px;border-top:1px solid #fff1;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:10px 25px;font-size:10px;flex-shrink:0}
+#graph-footer{min-height:65px;border-top:1px solid #fff1;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:10px 25px;font-size:10px;flex-shrink:0}
+.footer-keys{display:flex;flex-direction:column;gap:7px}
 .graph-key{display:flex;gap:17px;flex-wrap:wrap}
 .graph-key span{display:flex;align-items:center;gap:6px;color:#c4d2cd}
 .key-dot{width:5px;height:5px;display:inline-block;border-radius:50%}
@@ -136,7 +138,7 @@ h2{font-size:clamp(21px,2.1vw,30px);font-weight:450;letter-spacing:-.8px;margin:
 .modal.text-mode #modal-copy{padding:28px 34px 35px;overflow:auto;flex-shrink:1}
 .modal.text-mode #modal-graph,.modal.text-mode #graph-footer{display:none}
 .modal.journey-mode .modal-header{position:absolute;top:20px;right:20px;z-index:2;padding:0;border:0}
-.modal.journey-mode .modal-header>div,.modal.journey-mode #graph-footer .graph-key,.modal.journey-mode .graph-instructions{display:none}
+.modal.journey-mode .modal-header>div,.modal.journey-mode #graph-footer .footer-keys,.modal.journey-mode .graph-instructions{display:none}
 .modal.journey-mode #modal-copy{display:none}
 .modal.journey-mode #graph-footer{justify-content:flex-end}
 .modal.journey-mode #modal-graph{margin-top:35px}

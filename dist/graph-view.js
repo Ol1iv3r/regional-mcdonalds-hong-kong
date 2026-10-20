@@ -317,7 +317,7 @@ export class GraphView {
     this.annotationGroup = el('g', { class: 'graph-annotations', 'pointer-events': 'none' });
     this.world.append(this.edgeGroup, this.annotationGroup, this.nodeGroup); this.svg.append(this.world);
     for (const edge of this.edges) {
-      edge.path = el('path', { class: 'graph-edge', stroke: isEffectColor(edge.color) ? edge.color : PALETTE.neutral, 'stroke-width': this.options.geographic ? (isEffectColor(edge.color) ? .65 : .5) : isEffectColor(edge.color) ? 1.65 : 1.15, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'data-source': edge.source, 'data-target': edge.target, opacity: '0' });
+      edge.path = el('path', { class: 'graph-edge', stroke: isEffectColor(edge.color) ? edge.color : PALETTE.neutral, 'stroke-width': this.options.geographic ? (isEffectColor(edge.color) ? .65 : .5) : isEffectColor(edge.color) ? 1.65 : 1.05, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'data-source': edge.source, 'data-target': edge.target, opacity: '0' });
       if (this.options.journey || edge.arrows === 'end' || edge.arrows === 'both') edge.path.setAttribute('marker-end', `url(#${this.uid}-arrow)`);
       if (edge.arrows === 'start' || edge.arrows === 'both') edge.path.setAttribute('marker-start', `url(#${this.uid}-arrow)`);
       this.edgeGroup.append(edge.path);
@@ -336,7 +336,7 @@ export class GraphView {
       const hit = el('circle', { r: this.options.geographic ? Math.max(6, node.r + 3) : Math.max(18, node.r + 12), fill: 'transparent' });
       const glow = el('circle', { r: node.r + 8, fill: node.effectColor || '#f7dc9f', opacity: '0', class: 'graph-node-glow' });
       const circle = el('circle', { r: node.r, fill: node.role === 'root' ? (this.options.rootColor || '#f3cf6b') : '#d9dddf', stroke: node.role === 'root' ? (this.options.rootColor || '#ffe3a0') : '#162426', 'stroke-width': this.options.geographic ? .5 : node.role === 'root' ? 2 : 1.2 });
-      const text = el('text', { 'text-anchor': node.textAnchor, x: node.labelDx, y: node.labelOffset, fill: node.role === 'root' ? '#ffe3a0' : '#ecf0eb', 'font-family': FONT, 'font-size': node.fontSize, 'font-weight': node.role === 'root' || node.role === 'category' || node.role === 'hub' ? '500' : '400', 'paint-order': 'stroke', stroke: '#102023', 'stroke-width': this.options.geographic ? '.7' : '3', 'stroke-linejoin': 'round' });
+      const text = el('text', { 'text-anchor': node.textAnchor, x: node.labelDx, y: node.labelOffset, fill: node.role === 'root' ? '#ffe3a0' : '#ecf0eb', 'font-family': FONT, 'font-size': node.fontSize, 'font-weight': node.role === 'root' || node.role === 'category' || node.role === 'hub' ? '500' : '400', 'paint-order': 'stroke', stroke: '#102023', 'stroke-width': this.options.geographic ? '.7' : '3.5', 'stroke-linejoin': 'round' });
       node.lines.forEach((line, i) => { const span = el('tspan', { x: node.labelDx, dy: i ? node.lineHeight : 0 }); span.textContent = line; text.append(span); });
       group.append(title, hit, glow, circle, text);
       group.style.cursor = this.options.compact ? 'default' : 'grab';
@@ -393,7 +393,20 @@ export class GraphView {
   computeRoutes() {
     const boxes = this.nodes.map(n => ({ id: n.id, l: n.ax - n.textWidth / 2 - 9, r: n.ax + n.textWidth / 2 + 9, t: n.ay + n.labelOffset - n.fontSize - 3, b: n.ay + n.labelOffset + (n.lines.length - 1) * n.lineHeight + 6 }));
     for (const edge of this.edges) {
-      edge.route = this.options.geographic ? [{ x: edge.a.ax, y: edge.a.ay }, { x: edge.b.ax, y: edge.b.ay }] : route(edge.a, edge.b, boxes);
+      if (!this.options.geographic && !this.options.journey) {
+        // Keep a legible fan of connections: small continuous curves, never rectangular
+        // tours around every intervening label. Glyph halos and focus isolate dense links.
+        const a = { x: edge.a.ax, y: edge.a.ay }, b = { x: edge.b.ax, y: edge.b.ay };
+        const dx = b.x - a.x, dy = b.y - a.y, length = Math.hypot(dx, dy) || 1;
+        const side = Math.abs(dx) > 12 ? Math.sign(dx) : (Math.abs(hash(edge.id || edge.source + edge.target)) % 2 ? 1 : -1);
+        const bend = -side * Math.min(24, length * .045);
+        const nx = -dy / length * bend, ny = dx / length * bend;
+        edge.route = [a, { x: a.x + dx * .32 + nx, y: a.y + dy * .32 + ny }, { x: a.x + dx * .68 + nx, y: a.y + dy * .68 + ny }, b];
+        edge.curve = true;
+      } else {
+        edge.route = this.options.geographic ? [{ x: edge.a.ax, y: edge.a.ay }, { x: edge.b.ax, y: edge.b.ay }] : route(edge.a, edge.b, boxes);
+        edge.curve = false;
+      }
       edge.routeStart = { x: edge.a.ax, y: edge.a.ay };
       edge.routeEnd = { x: edge.b.ax, y: edge.b.ay };
       const lengths = [0];
@@ -551,6 +564,7 @@ export class GraphView {
     if (node) for (const e of this.edges) { if (e.a === node) adjacent.add(e.b.id); if (e.b === node) adjacent.add(e.a.id); }
     this.nodes.forEach(n => { n.glow.setAttribute('opacity', n === node ? '.14' : '0'); n.group.style.filter = node && !adjacent.has(n.id) ? 'opacity(.32)' : ''; });
     this.edges.forEach(e => { e.path.style.filter = node && e.a !== node && e.b !== node ? 'opacity(.13)' : ''; });
+    this.paint();
   }
 
   replay() {
@@ -623,7 +637,8 @@ export class GraphView {
     }
     for (const edge of this.edges) {
       const opacity = Math.min(edge.a.opacity, edge.b.opacity);
-      edge.path.setAttribute('opacity', opacity * (isEffectColor(edge.color) ? .9 : this.options.geographic ? .86 : .58));
+      const emphasized = this.highlighted && (edge.a === this.highlighted || edge.b === this.highlighted);
+      edge.path.setAttribute('opacity', opacity * (emphasized ? .96 : isEffectColor(edge.color) ? .9 : this.options.geographic ? .86 : this.options.journey ? .6 : .46));
       if (opacity <= 0) continue;
       const points = edge.route.map((p, i) => {
         const t = edge.fractions[i];
@@ -638,7 +653,7 @@ export class GraphView {
         const padding = edge.b.r + (this.options.journey ? 3 : 0);
         points[points.length - 1] = { x: last.x + (before.x - last.x) / dr * padding, y: last.y + (before.y - last.y) / dr * padding };
       }
-      edge.path.setAttribute('d', roundedPath(points));
+      edge.path.setAttribute('d', edge.curve && points.length === 4 ? `M ${points[0].x.toFixed(2)} ${points[0].y.toFixed(2)} C ${points[1].x.toFixed(2)} ${points[1].y.toFixed(2)} ${points[2].x.toFixed(2)} ${points[2].y.toFixed(2)} ${points[3].x.toFixed(2)} ${points[3].y.toFixed(2)}` : roundedPath(points));
     }
   }
 
