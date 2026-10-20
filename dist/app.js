@@ -1,4 +1,6 @@
 import { GraphView } from './graph-view.js';
+import { minimumScale, constrainView } from './map-viewport.js';
+import { layoutAnnotations } from './map-annotations.js';
 
 const $ = id => document.getElementById(id);
 const svgNS = 'http://www.w3.org/2000/svg';
@@ -10,9 +12,9 @@ let content, worldHeight, baseScale, mapFrame = 0, introGraph, modalGraph, retur
 let photoElements = [], pinElements = [], leaderElements = [];
 let exploring = false, moved = false, pinchState = null, modalSession = 0;
 const offsets = [
-  { x: -173, y: 51 }, // Hung Hom: west of its close neighbour.
-  { x: 53, y: -110 },
-  { x: 54, y: -81 },
+  { x: -170, y: 72 }, // Keep Hung Hom below-left and the Bay branch above-left.
+  { x: -170, y: -135 },
+  { x: 55, y: -105 },
   { x: -75, y: -123 },
   { x: -151, y: -70 }
 ];
@@ -33,14 +35,17 @@ async function load() {
     $('map-world').style.width = `${worldWidth}px`;
     $('map-world').style.height = `${worldHeight}px`;
     $('basemap').src = content.map.src;
-    $('basemap').addEventListener('load', () => { $('loading-note').textContent = ''; }, { once: true });
-    if ($('basemap').complete) $('loading-note').textContent = '';
+    $('basemap').addEventListener('load', () => {
+      $('loading-note').textContent = '';
+      $('explore').disabled = false;
+    }, { once: true });
+    if ($('basemap').complete && $('basemap').naturalWidth) $('loading-note').textContent = '';
     $('basemap').addEventListener('error', () => { $('loading-note').textContent = 'Map image unavailable. Refresh to try again.'; });
     createMap();
     renderJourneyMini();
     introGraph = new GraphView($('intro-journey'), content.journey, { journey: true, compact: true, reducedMotion });
     resetMap(true);
-    $('explore').disabled = false;
+    $('explore').disabled = !$('basemap').naturalWidth;
     document.body.dataset.ready = 'true';
   } catch (error) {
     console.error(error);
@@ -78,7 +83,7 @@ function createMap() {
     pin.innerHTML = `<span>${index + 1}</span>`;
     pin.addEventListener('click', event => { if (!moved || event.detail === 0) openRestaurant(restaurant); });
     $('restaurants').append(pin);
-    pinElements.push(pin);
+    registerPin(pin,restaurant.anchor,restaurant,index,`${restaurant.id}-primary`);
     if (restaurant.secondaryAnchor) {
       const secondary = pin.cloneNode(true);
       secondary.setAttribute('aria-label', `Explore ${name} — second location`);
@@ -86,7 +91,7 @@ function createMap() {
       secondary.style.top = `${restaurant.secondaryAnchor.y * worldHeight}px`;
       secondary.addEventListener('click', event => { if (!moved || event.detail === 0) openRestaurant(restaurant); });
       $('restaurants').append(secondary);
-      pinElements.push(secondary);
+      registerPin(secondary,restaurant.secondaryAnchor,restaurant,index,`${restaurant.id}-secondary`);
     }
     const photos = restaurant.photos || [];
     if (photos[0]) {
@@ -118,28 +123,79 @@ function createMap() {
   });
 }
 
+function registerPin(el, anchor, restaurant, index, id) {
+  const line = elementNS('line', { class:'pin-leader',stroke:'#ffd9c1','stroke-width':'1',opacity:'.9','vector-effect':'non-scaling-stroke' });
+  const dot = elementNS('circle', { fill:'#ed7166',stroke:'#fff1dc','stroke-width':'.7','vector-effect':'non-scaling-stroke' });
+  $('photo-leaders').append(line,dot);
+  pinElements.push({el,anchor,restaurant,index,id,line,dot});
+}
+
+function viewport() {
+  return { width:innerWidth,height:innerHeight,worldWidth,worldHeight };
+}
+function constrainTarget() {
+  const next = constrainView({x:camera.tx,y:camera.ty,scale:camera.ts},viewport());
+  camera.tx = next.x; camera.ty = next.y; camera.ts = next.scale;
+}
+function constrainCurrent() {
+  const next = constrainView(camera,viewport());
+  if (next.x !== camera.x) camera.vx = 0;
+  if (next.y !== camera.y) camera.vy = 0;
+  if (next.scale !== camera.scale) camera.vs = 0;
+  camera.x = next.x; camera.y = next.y; camera.scale = next.scale;
+}
+
 function renderMap() {
+  constrainCurrent();
   $('map-world').style.transform = `translate(${camera.x}px, ${camera.y}px) scale(${camera.scale})`;
   $('map-world').style.setProperty('--inverse-scale', 1 / camera.scale);
-  const mobile = innerWidth < 900, photoWidth = mobile ? 98 : 132;
-  photoElements.forEach(({ el, restaurant, offset }, index) => {
-    const x = restaurant.anchor.x * worldWidth, y = restaurant.anchor.y * worldHeight;
-    const narrowOffsets = [{x:-95,y:70},{x:-30,y:-160},{x:30,y:-30},{x:-65,y:-110},{x:-140,y:-50}];
-    const adjusted = mobile ? narrowOffsets[content.restaurants.indexOf(restaurant)] || offset : offset;
-    const dx = adjusted.x, dy = adjusted.y;
-    el.style.left = `${x + dx / camera.scale}px`;
-    el.style.top = `${y + dy / camera.scale}px`;
-    const edgeX = dx < 0 ? dx + photoWidth : dx;
+  const project = anchor => ({x:camera.x+anchor.x*worldWidth*camera.scale,y:camera.y+anchor.y*worldHeight*camera.scale});
+  const obstacles = [$('about-open'),$('prompt-open'),$('journey-open'),document.querySelector('.map-controls')].map(el => {
+    const r = el.getBoundingClientRect();
+    return {x:r.x-8,y:r.y-8,width:r.width+16,height:r.height+16};
+  });
+  const pins = pinElements.map(({id,anchor,restaurant,index}) => ({id,...project(anchor),restaurantId:restaurant.id,index}));
+  const cards = photoElements.map(({el,restaurant,offset}) => {
+    el.hidden = false; // Measure its fixed screen size even after it was off-map.
+    const point = project(restaurant.anchor);
+    const small = innerWidth < 900;
+    return {id:restaurant.id,anchorX:point.x,anchorY:point.y,width:el.offsetWidth,height:el.offsetHeight,
+      preferred:small?{x:offset.x*.8,y:offset.y*.85}:offset};
+  });
+  const layout = layoutAnnotations({width:innerWidth,height:innerHeight,pins,cards,obstacles});
+  pinElements.forEach(({el,anchor,line,dot},i) => {
+    const p = layout.pins[i];
+    el.hidden = !p.visible;
+    el.style.left = `${(p.x-camera.x)/camera.scale}px`;
+    el.style.top = `${(p.y-camera.y)/camera.scale}px`;
+    const x = anchor.x*worldWidth,y = anchor.y*worldHeight;
+    const displaced = Math.hypot(p.x-p.anchorX,p.y-p.anchorY)>3;
+    line.setAttribute('x1',x); line.setAttribute('y1',y);
+    line.setAttribute('x2',(p.x-camera.x)/camera.scale);line.setAttribute('y2',(p.y-camera.y)/camera.scale);
+    line.style.display = p.visible&&displaced?'':'none';
+    dot.setAttribute('cx',x);dot.setAttribute('cy',y);dot.setAttribute('r',2.5/camera.scale);
+    dot.style.display = p.visible&&displaced?'':'none';
+  });
+  photoElements.forEach(({el,restaurant},index) => {
+    const p = layout.cards[index];
+    el.hidden = !p.visible;
+    el.style.left = `${(p.x-camera.x)/camera.scale}px`;
+    el.style.top = `${(p.y-camera.y)/camera.scale}px`;
+    const anchor = project(restaurant.anchor);
+    const endX = Math.min(p.x+p.width,Math.max(p.x,anchor.x));
+    const endY = Math.min(p.y+p.height,Math.max(p.y,anchor.y));
     const line = leaderElements[index];
-    line.setAttribute('x1', x);
-    line.setAttribute('y1', y);
-    line.setAttribute('x2', x + edgeX / camera.scale);
-    line.setAttribute('y2', y + (dy + (mobile ? 30 : 41)) / camera.scale);
+    line.setAttribute('x1',restaurant.anchor.x*worldWidth);
+    line.setAttribute('y1',restaurant.anchor.y*worldHeight);
+    line.setAttribute('x2',(endX-camera.x)/camera.scale);
+    line.setAttribute('y2',(endY-camera.y)/camera.scale);
+    line.style.display = p.visible?'':'none';
   });
 }
 
 function animateMap() {
   mapFrame = 0;
+  constrainTarget();
   if (reducedMotion) {
     Object.assign(camera, { x: camera.tx, y: camera.ty, scale: camera.ts, vx: 0, vy: 0, vs: 0 });
     renderMap(); return;
@@ -155,10 +211,10 @@ function animateMap() {
     camera.x = camera.tx; camera.y = camera.ty; camera.scale = camera.ts; renderMap();
   }
 }
-function wakeMap() { if (!mapFrame) mapFrame = requestAnimationFrame(animateMap); }
+function wakeMap() { constrainTarget(); if (!mapFrame) mapFrame = requestAnimationFrame(animateMap); }
 function resetMap(immediate = false) {
   if (!worldHeight) return;
-  baseScale = Math.min(innerWidth / worldWidth, innerHeight / worldHeight);
+  baseScale = minimumScale(innerWidth,innerHeight,worldWidth,worldHeight);
   camera.ts = baseScale;
   camera.tx = (innerWidth - worldWidth * baseScale) / 2;
   camera.ty = (innerHeight - worldHeight * baseScale) / 2;
@@ -168,7 +224,7 @@ function resetMap(immediate = false) {
   } else wakeMap();
 }
 function zoom(factor, x = innerWidth / 2, y = innerHeight / 2) {
-  const newScale = Math.min(baseScale * 15, Math.max(baseScale * .7, camera.ts * factor));
+  const newScale = Math.min(baseScale * 15, Math.max(baseScale, camera.ts * factor));
   const ratio = newScale / camera.ts;
   camera.tx = x - (x - camera.tx) * ratio;
   camera.ty = y - (y - camera.ty) * ratio;
@@ -183,6 +239,12 @@ $('map').addEventListener('wheel', event => {
 }, { passive: false });
 $('map').addEventListener('pointerdown', event => {
   if (!exploring || event.button > 0 || !$('modal').hidden) return;
+  if (!pointers.size) {
+    if (mapFrame) cancelAnimationFrame(mapFrame);
+    mapFrame = 0;
+    camera.tx = camera.x; camera.ty = camera.y; camera.ts = camera.scale;
+    camera.vx = camera.vy = camera.vs = 0;
+  }
   moved = false;
   pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY });
   if (!event.target.closest('button')) $('map').setPointerCapture(event.pointerId);
@@ -203,10 +265,12 @@ window.addEventListener('pointermove', event => {
     if (pinchState) {
       zoom(distance / Math.max(1, pinchState.distance), x, y);
       camera.tx += x - pinchState.x; camera.ty += y - pinchState.y;
+      constrainTarget();
     }
     pinchState = { distance, x, y };
   } else {
     camera.tx += dx; camera.ty += dy;
+    constrainTarget();
     camera.x = camera.tx; camera.y = camera.ty; camera.vx = camera.vy = 0;
     renderMap();
   }

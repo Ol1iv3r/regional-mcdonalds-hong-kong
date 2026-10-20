@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: '22'
       - run: node tests/integrity.mjs
+      - run: node tests/map-viewport.mjs && node tests/map-annotations.mjs
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

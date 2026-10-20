@@ -15,7 +15,8 @@ Open [http://localhost:8780](http://localhost:8780). Serve the files over HTTP; 
 ## Explore
 
 - The opening screen introduces the research and the complete customer journey.
-- Select **Explore the map** to pan around Hong Kong. Scroll or pinch to zoom; the reset control restores the full map.
+- Select **Explore the map** to pan around Hong Kong. Scroll or pinch to zoom; the reset control restores a centered map that fills the viewport. Zoom and drag boundaries keep empty borders out of view.
+- Restaurant photographs and numbered markers avoid one another and the fixed controls. Nearby markers separate with short leader lines back to their original geographic coordinates.
 - Click a red location point or restaurant photograph to unfold its complete graph in a translucent window over the map.
 - Graphs unfold in stages with damped motion. Drag nodes, drag the graph background to pan, and scroll or pinch to zoom. The lower controls provide replay, fit, and zoom. Closing the window restores the same map position.
 - The research prompt, title/reading key, and customer-journey dock each open a larger panel. Use the close button or Escape to return.
@@ -40,9 +41,11 @@ Requires Node.js 20 or later:
 
 ```sh
 node tests/integrity.mjs
+node tests/map-viewport.mjs
+node tests/map-annotations.mjs
 ```
 
-This verifies original graph IDs and relationship fingerprints, connected graphs, valid endpoints, normalized map coordinates, exact image hashes, local asset references, JavaScript syntax, and the absence of private source documents or recognizable credential patterns in `dist/`. Browser interaction and visual checks remain a separate review.
+This verifies original graph IDs and relationship fingerprints, connected graphs, valid endpoints, normalized map coordinates, exact image hashes, local asset references, JavaScript syntax, viewport coverage during camera motion, and annotation separation at different viewport sizes. It also checks for private source documents or recognizable credential patterns in `dist/`. Browser interaction and visual checks remain a separate review.
 
 ## Publish with GitHub Pages
 
@@ -54,6 +57,7 @@ Keep `assets/` paths relative so the site works under a GitHub project URL. Publ
 
 - `dist/index.html`, `style.css`, `app.js`: introduction, map, controls and panels.
 - `dist/graph-view.js`: SVG graph layout, interaction, routing and motion.
+- `dist/map-viewport.js`, `map-annotations.js`: camera boundaries and collision-free photo/marker placement.
 - `dist/assets/content.json`: restaurant systems, customer journey, map coordinates and poster text.
 - `dist/assets/provenance.json`: original image hashes and extraction audit.
 - `tests/`: content integrity and source-topology checks.
