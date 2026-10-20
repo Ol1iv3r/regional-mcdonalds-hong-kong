@@ -1,0 +1,41 @@
+{
+  "description": "Topology fingerprints from the original editable system-map scenes, excluding text and geometry so current PDF wording can be retained.",
+  "restaurants": {
+    "01-hung-hom": {
+      "nodes": 53,
+      "edges": 66,
+      "nodeIdsSha256": "734a0ed0237c054e3e9696b5e5c3456992425c52fa4632b4b60c99e589a151bb",
+      "edgeTopologySha256": "8a3d85421a031de13571788c57ab32eafcf1a5b9c25685a2dd5ffb219f88c7c4"
+    },
+    "02-hung-hom-bay": {
+      "nodes": 42,
+      "edges": 58,
+      "nodeIdsSha256": "129680a546670cdef90fff00dc78c581c19cbb33d144a00e5d1a3a250dd36711",
+      "edgeTopologySha256": "fa856a010082a77fd34b620d16797e495c7bdfd2a76f937d09fc91995cf0c387"
+    },
+    "03-hkust": {
+      "nodes": 37,
+      "edges": 49,
+      "nodeIdsSha256": "35f6978912ee1bacef9e2821999393f610a812aa9f22ec06a7c4efbd21a8d9ee",
+      "edgeTopologySha256": "481e7d4b06eefeb2dd1d6aa7696780f972ba3a5e82b7844d0c8d0e89d458692d"
+    },
+    "04-hong-kong-airport": {
+      "nodes": 40,
+      "edges": 53,
+      "nodeIdsSha256": "231159c35398b2a9b2af0682f786815c16da13b315dbf535bd057d3490973808",
+      "edgeTopologySha256": "e6c6322b1777a36d3059c7e980c3f3009ea046d71690c34213822d4fa33464f6"
+    },
+    "05-cheung-chau": {
+      "nodes": 38,
+      "edges": 52,
+      "nodeIdsSha256": "0c8833586faebe22319b11786d2526f574db5fbe8109737ce1c7168ebcdf1794",
+      "edgeTopologySha256": "28d50bc9675cf516797d2a38518f69153b9d37c54dd5ef52034a6d2b31d717c9"
+    }
+  },
+  "journey": {
+    "nodes": 17,
+    "edges": 25,
+    "nodeIdsSha256": "3e4c45d88226e1f618c1f21e49e78cc68148cccee1c6afda856352dd63c0167c",
+    "edgeTopologySha256": "86f6d85ee25e7ee39a39cef1e8883838b8990952a989c3a0d998bd3047066611"
+  }
+}

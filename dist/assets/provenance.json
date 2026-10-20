@@ -1,0 +1,124 @@
+{
+  "pdfFilename": "A1-with-current-canvas.pdf",
+  "pdfSha256": "2da9714f3af89fa5495cddb9f46699c4af42120f6fea9a077db27cddc4cd1477",
+  "pdfModified": 1792433131.3871195,
+  "media": {
+    "0": {
+      "src": "assets/hong-kong-map.jpg",
+      "width": 7923,
+      "height": 5596,
+      "sha256": "4a25032a7055397e2001663e5bd5c95f87ce2e58ab23df868931454c1e92f810",
+      "originalBytes": 17233201
+    },
+    "1": {
+      "src": "assets/hung-hom.jpg",
+      "width": 251,
+      "height": 208,
+      "sha256": "e3440bdaf0238838dcf687a5fd06c3de6860bf9d94a394718a418656fd6060ee",
+      "originalBytes": 31293
+    },
+    "4": {
+      "src": "assets/airport-landside.jpg",
+      "width": 352,
+      "height": 272,
+      "sha256": "b7bbc5d18229cef41911a368493af79f9fc8214b7f0b0307f97c0eb30a8dd090",
+      "originalBytes": 48880
+    },
+    "5": {
+      "src": "assets/airport-airside.jpg",
+      "width": 445,
+      "height": 275,
+      "sha256": "b9896786c7b114063986529bb478cbc29cff14b9f99eddb97648cd4a81dab4b7",
+      "originalBytes": 48713
+    },
+    "6": {
+      "src": "assets/cheung-chau.jpg",
+      "width": 319,
+      "height": 231,
+      "sha256": "733a4c43c6fb016c901379dd0251d101d186fae8dc674b0b0b6a700d0d3a30e7",
+      "originalBytes": 35108
+    },
+    "7": {
+      "src": "assets/hung-hom-bay.jpg",
+      "width": 243,
+      "height": 191,
+      "sha256": "55d06efcdf94229bb6bde397f946d38b1a0a7c42ec45e74a255a9f413538bf85",
+      "originalBytes": 29536
+    },
+    "8": {
+      "src": "assets/hkust.jpg",
+      "width": 363,
+      "height": 243,
+      "sha256": "b32683e2f3e22d1b01bde8b8fc05988d8217817992fabba4aa5e2a18922519ca",
+      "originalBytes": 41167
+    }
+  },
+  "graphs": [
+    {
+      "id": "01-hung-hom",
+      "nodes": 53,
+      "edges": 66,
+      "allNodesHaveCurrentForegroundText": true
+    },
+    {
+      "id": "02-hung-hom-bay",
+      "nodes": 42,
+      "edges": 58,
+      "allNodesHaveCurrentForegroundText": true
+    },
+    {
+      "id": "03-hkust",
+      "nodes": 37,
+      "edges": 49,
+      "allNodesHaveCurrentForegroundText": true
+    },
+    {
+      "id": "04-hong-kong-airport",
+      "nodes": 40,
+      "edges": 53,
+      "allNodesHaveCurrentForegroundText": true
+    },
+    {
+      "id": "05-cheung-chau",
+      "nodes": 38,
+      "edges": 52,
+      "allNodesHaveCurrentForegroundText": true
+    }
+  ],
+  "journeyNodes": 17,
+  "journeyEdges": 25,
+  "mapCoordinates": {
+    "artboard_mm": [
+      841,
+      594
+    ],
+    "crs": "EPSG:3857",
+    "coordinate_input": "EPSG:4326",
+    "bounds_wgs84": {
+      "west": 113.81,
+      "south": 22.137736606205035,
+      "east": 114.49,
+      "north": 22.581909285817513
+    },
+    "xyz_zoom": 14,
+    "global_pixel_bounds": [
+      3423134.606222222,
+      1826965.1136693435,
+      3431057.1804444445,
+      1832560.8438572155
+    ],
+    "global_world_pixels": 4194304,
+    "native_image_pixels": [
+      7923,
+      5596
+    ],
+    "effective_dpi_on_A1": 239.29,
+    "tile_count": 736,
+    "imagery_source": "https://mapapi.geodata.gov.hk/gs/api/v1.0.0/xyz/imagery/WGS84/{z}/{x}/{y}.png",
+    "imagery_documentation": "https://tools.csdi.gov.hk/csdi-webpage/apidoc/ImageryMapAPI",
+    "terms": "https://tools.csdi.gov.hk/csdi-webpage/doc/TNC",
+    "attribution": "Map information © Lands Department, HKSAR Government | Image ©2002/2016/2024 NASA/USGS",
+    "retrieved_date_hong_kong": "2026-10-19",
+    "note": "Imagery is a source mosaic from different capture dates, not real-time photography. No map controls or analytical rectangles added."
+  }
+}

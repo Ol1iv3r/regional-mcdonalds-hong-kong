@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102c30">
+  <meta name="description" content="An interactive system map of McDonald’s across Hong Kong. Explore how place, people and space shape an ordinary meal.">
+  <title>Regional McDonald’s — Hong Kong</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="map" aria-label="Interactive map of McDonald’s in Hong Kong" tabindex="0">
+    <div id="map-world">
+      <img id="basemap" alt="Satellite map of Hong Kong" draggable="false">
+      <div class="map-shade"></div>
+      <svg id="locations" aria-label="Restaurant locations"></svg>
+      <svg id="photo-leaders" aria-hidden="true"></svg>
+      <div id="map-graphs"></div>
+      <div id="restaurants"></div>
+    </div>
+    <div class="map-vignette" aria-hidden="true"></div>
+  </main>
+
+  <header class="map-header map-ui">
+    <button id="about-open" class="wordmark" aria-label="About Regional McDonald’s and the evidence key">
+      <svg class="poster-wordmark" viewBox="0 0 425 180" role="img" aria-label="Regional McDonald’s"><image href="assets/brand-mark.png" x="281" y="0" width="130" height="94"/><text x="0" y="98" font-size="60">Regional</text><text x="0" y="170" font-size="71.4">McDonald’s</text></svg>
+    </button>
+    <button id="prompt-open" class="prompt-button" aria-label="Open the questions behind this map">
+      <span class="prompt-orbit" aria-hidden="true">?</span>
+      <span>Same food.<br><strong>A different experience?</strong></span>
+      <span class="prompt-arrow" aria-hidden="true">↗</span>
+    </button>
+  </header>
+
+  <div class="map-controls map-ui" aria-label="Map controls">
+    <button id="zoom-in" aria-label="Zoom in">+</button>
+    <button id="zoom-out" aria-label="Zoom out">−</button>
+    <span class="control-divider"></span>
+    <button id="reset-map" aria-label="Reset map view" title="Reset map">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4m0 0h5M4 4l5 5m11 6v5m0 0h-5m5 0-5-5M15 4h5v5M9 20H4v-5"/></svg>
+    </button>
+  </div>
+  <button id="journey-open" class="journey-dock map-ui" aria-label="Open the customer journey">
+    <span class="dock-heading"><span>THE CUSTOMER JOURNEY</span><span aria-hidden="true">↗</span></span>
+    <svg id="journey-mini" viewBox="0 0 520 110" aria-hidden="true"></svg>
+    <span class="dock-caption">One meal. More than the food.</span>
+  </button>
+  <p id="inline-note" hidden></p>
+  <div id="inline-tools" hidden>
+    <div class="inline-keys">
+      <div class="graph-key"><span><i class="key-dot positive-bg"></i>Positive</span><span><i class="key-dot depends-bg"></i>Depends</span><span><i class="key-dot negative-bg"></i>Negative</span></div>
+      <div class="inline-evidence">[F] Fact · [OBS] Descriptive · [?] Tentative · [TBC] Unverified<br>[EXP/?] Prior experience · [HEARSAY] Unconfirmed report</div>
+    </div>
+    <div class="inline-tool-buttons"><button id="inline-replay" aria-label="Replay last opened graph">↻</button><button id="inline-fit" aria-label="Fit the whole map">⛶</button><button id="inline-close">Collapse <span aria-hidden="true">×</span></button></div>
+  </div>
+
+  <section id="intro" class="intro" aria-labelledby="intro-title">
+    <div class="intro-content">
+      <h1 id="intro-title">Regional<br><span>McDonald’s<span class="yellow-period">.</span></span></h1>
+      <p class="intro-copy">This is a journey through a McDonald’s, as <b>me, a customer or a delivery courier.</b> We leave with an impression — shaped by the taste of the food, but also by the space we experience.</p>
+      <p class="intro-question">Across Hong Kong, what changes from one restaurant to another?<br>And which part of the journey becomes <span class="positive">positive</span>, <span class="negative">negative</span>, or <span class="depends">dependent on context</span>?</p>
+    </div>
+    <div class="intro-journey-wrap">
+      <div id="intro-journey" aria-label="Customer journey node graph"></div>
+      <button id="intro-journey-open" class="journey-preview-hit" aria-label="Enlarge the customer journey"></button>
+    </div>
+    <div class="intro-bottom">
+      <button id="explore" class="explore-button">Explore the map <span aria-hidden="true">↗</span></button>
+    </div>
+    <span id="loading-note" role="status">Preparing your map…</span>
+  </section>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop"></div>
+    <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <header class="modal-header">
+        <div><span id="modal-kicker" class="eyebrow"></span><h2 id="modal-title"></h2></div>
+        <button id="modal-close" class="icon-button close-button" aria-label="Close panel">×</button>
+      </header>
+      <div id="modal-copy"></div>
+      <div id="modal-graph"></div>
+      <footer id="graph-footer">
+        <div class="graph-key"><span><i class="key-dot positive-bg"></i>Positive</span><span><i class="key-dot depends-bg"></i>Depends</span><span><i class="key-dot negative-bg"></i>Negative</span></div>
+        <span class="graph-instructions">Drag nodes · Scroll to zoom · Drag the background to move</span>
+        <div class="graph-controls"><button id="graph-zoom-in" aria-label="Zoom into graph">+</button><button id="graph-zoom-out" aria-label="Zoom out of graph">−</button><button id="graph-replay">Replay ↻</button><button id="graph-fit">Fit view ⛶</button></div>
+      </footer>
+    </section>
+  </div>
+  <div id="error" role="alert" hidden>We couldn’t load the map. Please refresh to try again.</div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
